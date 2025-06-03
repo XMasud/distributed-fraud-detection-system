@@ -1,11 +1,12 @@
 package com.pm.userservice.service;
 
+import com.pm.userservice.dto.UserRequestDTO;
 import com.pm.userservice.dto.UserResponseDTO;
 import com.pm.userservice.exception.UserNotFoundException;
 import com.pm.userservice.model.User;
 import com.pm.userservice.repository.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -34,8 +35,8 @@ public class UserService {
 
         List<User> users = userRepository.findByCountry(country);
 
-        if(users.isEmpty())
-            throw new UserNotFoundException("No user found in country: "+country);
+        if (users.isEmpty())
+            throw new UserNotFoundException("No user found in country: " + country);
 
         return users.stream()
                 .map(user -> new UserResponseDTO(
@@ -45,6 +46,26 @@ public class UserService {
                         user.getCountry(),
                         user.getTotalBalance()
                 )).collect(Collectors.toList());
+    }
+
+    public UserResponseDTO createUser(UserRequestDTO request) {
+        User user = new User();
+        user.setName(request.getName());
+        user.setEmail(request.getEmail());
+        user.setCountry(request.getCountry());
+        user.setDateOfBirth(request.getDateOfBirth());
+        user.setGender(request.getGender());
+        user.setAddress(request.getAddress());
+
+        User saveUser = userRepository.save(user);
+
+        return new UserResponseDTO(
+                saveUser.getId(),
+                saveUser.getName(),
+                saveUser.getEmail(),
+                saveUser.getCountry(),
+                saveUser.getTotalBalance()
+        );
     }
 
 }
