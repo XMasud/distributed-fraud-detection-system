@@ -10,8 +10,8 @@ import org.springframework.web.context.request.WebRequest;
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler(UserNotFoundException.class)
-    public ResponseEntity<?> handleUserNotFound(UserNotFoundException exception, WebRequest request){
+    @ExceptionHandler(NotFoundException.class)
+    public ResponseEntity<?> handleNotFoundException(NotFoundException exception, WebRequest request){
 
         APIErrorResponseDTO error = new APIErrorResponseDTO(
                 HttpStatus.NOT_FOUND.value(),

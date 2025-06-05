@@ -2,11 +2,10 @@ package com.pm.userservice.service;
 
 import com.pm.userservice.dto.UserRequestDTO;
 import com.pm.userservice.dto.UserResponseDTO;
-import com.pm.userservice.exception.UserNotFoundException;
+import com.pm.userservice.exception.NotFoundException;
 import com.pm.userservice.model.User;
 import com.pm.userservice.repository.UserRepository;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -36,7 +35,7 @@ public class UserService {
         List<User> users = userRepository.findByCountry(country);
 
         if (users.isEmpty())
-            throw new UserNotFoundException("No user found in country: " + country);
+            throw new NotFoundException("No user found in country: " + country);
 
         return users.stream()
                 .map(user -> new UserResponseDTO(
@@ -67,5 +66,4 @@ public class UserService {
                 saveUser.getTotalBalance()
         );
     }
-
 }
