@@ -1,12 +1,19 @@
+# postgres.yaml
+
+---
 apiVersion: v1
-kind: Secret
+kind: PersistentVolumeClaim
 metadata:
-  name: postgres-secret
-type: Opaque
-data:
-  POSTGRES_USER: YWRtaW4=           # base64 of 'admin'
-  POSTGRES_PASSWORD: cGFzc3dvcmQ=   # base64 of 'password'
-  POSTGRES_DB: dXNlci1zZXJ2aWNl     # base64 of 'user-service'
+  name: postgres-pv-claim
+  labels:
+    app: user-service-db
+    tier: database
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -21,6 +28,7 @@ spec:
     metadata:
       labels:
         app: user-service-db
+        tier: database
     spec:
       containers:
         - name: postgres
@@ -46,18 +54,26 @@ spec:
           volumeMounts:
             - name: postgres-data
               mountPath: /var/lib/postgresql/data
+          args:
+            - "-p"
+            - "5000"
       volumes:
         - name: postgres-data
-          emptyDir: {}
+          persistentVolumeClaim:
+            claimName: postgres-pv-claim
 ---
 apiVersion: v1
 kind: Service
 metadata:
   name: user-service-db
+  labels:
+    app: user-service-db
+    tier: database
 spec:
-  type: ClusterIP
+  ports:
+    - name: postgres
+      port: 5000
+      targetPort: 5000
   selector:
     app: user-service-db
-  ports:
-    - port: 5432
-      targetPort: 5000
+    tier: database
