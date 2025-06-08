@@ -2,6 +2,7 @@ package com.pm.userservice.service;
 
 import com.pm.userservice.dto.UserRequestDTO;
 import com.pm.userservice.dto.UserResponseDTO;
+import com.pm.userservice.exception.ExistUserException;
 import com.pm.userservice.exception.NotFoundException;
 import com.pm.userservice.model.User;
 import com.pm.userservice.repository.UserRepository;
@@ -48,6 +49,13 @@ public class UserService {
     }
 
     public UserResponseDTO createUser(UserRequestDTO request) {
+
+        User existingUser = userRepository.findUserByEmail(request.getEmail());
+
+        if (existingUser != null) {
+            throw new ExistUserException("Email already exists!!!");
+        }
+
         User user = new User();
         user.setName(request.getName());
         user.setEmail(request.getEmail());
